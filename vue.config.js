@@ -16,6 +16,12 @@ module.exports = defineConfig({
       config.devtool = 'cheap-module-source-map'
     }
   },
+  chainWebpack: config => {
+    config.plugin('html').tap(args => {
+      args[0].title = 'Vue 商城'
+      return args
+    })
+  },
   css: {
     loaderOptions: {
       stylus: {
