@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import './theme.styl'
 
 // By default we import all the components.
 // Only reserve the components on demand and remove the rest.
