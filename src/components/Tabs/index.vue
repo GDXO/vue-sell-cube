@@ -20,7 +20,11 @@
         @scroll="onScrollFn"
       >
         <cube-slide-item v-for="(tab, tabIndex) of tabs" :key="tabIndex">
-          <component :is="tab.component" :data="tab.data"></component>
+          <component
+            :is="tab.component"
+            :data="tab.data"
+            ref="slideComponent"
+          ></component>
         </cube-slide-item>
       </cube-slide>
     </div>
@@ -40,6 +44,9 @@ export default {
       type: Number,
       default: 0
     }
+  },
+  mounted () {
+    this.onChangeFn(this.index)
   },
   data () {
     return {
@@ -64,12 +71,16 @@ export default {
   methods: {
     onChangeFn (current) {
       this.index = current
+
+      const thisComponent = this.$refs.slideComponent[current]
+
+      thisComponent.fetchData && thisComponent.fetchData()
     },
     onScrollFn (pos) {
       const tabBarRef = this.$refs.tabBar
       const tabBarWidth = tabBarRef.$el.clientWidth
       const sliderWidth = this.$refs.tabsSlide.slide.scrollerWidth
-      const tabBarTransformWidth = -pos.x / sliderWidth * tabBarWidth
+      const tabBarTransformWidth = (-pos.x / sliderWidth) * tabBarWidth
 
       tabBarRef.setSliderTransform(tabBarTransformWidth)
     }
@@ -85,7 +96,7 @@ export default {
     padding: 10px 0
   display: flex
   flex-direction: column
-  height: 100%
+  height: calc(100% - 134px)
 
   .sliderContainer
     flex: 1
