@@ -4,9 +4,34 @@
       <cube-scroll-nav
         :side="true"
         :data="goods"
-        :navOptions="scrollOptions"
+        :options="scrollOptions"
         v-if="goods.length"
       >
+        <template slot="bar" slot-scope="props">
+          <cube-scroll-nav-bar
+            direction="vertical"
+            :labels="props.labels"
+            :txts="barTxts"
+            :current="props.current"
+          >
+            <template slot-scope="props">
+              <span class="menuText">
+                <SupportIco
+                  v-show="props.txt.type > 0"
+                  class="menuIcon"
+                  :iconType="props.txt.type"
+                  :imageName="3"
+                  :imageWidth="12"
+                  :imageHeight="12"
+                  :marginRight="2"
+                />{{ props.txt.name }}
+                <span class="countBox" v-show="props.txt.count">
+                  <Bubble :count="props.txt.count" />
+                </span>
+              </span>
+            </template>
+          </cube-scroll-nav-bar>
+        </template>
         <cube-scroll-nav-panel
           v-for="goodsItem in goods"
           :key="goodsItem.name"
@@ -43,7 +68,7 @@
                   </span>
                 </div>
                 <div class="cartControlContainer">
-                  <!-- <CartControl :food="foodItem"/> -->
+                  <CartControl :food="foodItem" @addCount="onAddFn" />
                 </div>
               </div>
             </li>
@@ -51,14 +76,30 @@
         </cube-scroll-nav-panel>
       </cube-scroll-nav>
     </div>
+    <ShopCart
+      :deliveryPrice="seller.deliveryPrice"
+      :minDeliveryPrice="seller.minPrice"
+      :foodsList="selectedFoods"
+      ref="shopCart"
+    />
   </div>
 </template>
 
 <script>
 import { getGoodsData } from '@/api/'
+import SupportIco from '@/components/SupportIco/'
+import Bubble from '@/components/Bubble/'
+import ShopCart from '@/components/ShopCart/'
+import CartControl from '@/components/CartControl/'
 
 export default {
   name: 'pageGoods',
+  components: {
+    SupportIco,
+    Bubble,
+    ShopCart,
+    CartControl
+  },
   props: {
     data: {
       type: Object,
@@ -74,11 +115,49 @@ export default {
       }
     }
   },
+  computed: {
+    seller () {
+      return this.data.seller
+    },
+    selectedFoods () {
+      const resultFoods = []
+      this.goods.forEach(goodsItem => {
+        goodsItem.foods.forEach(foodItem => {
+          if (foodItem.count) {
+            resultFoods.push(foodItem)
+          }
+        })
+      })
+      return resultFoods
+    },
+    barTxts () {
+      const resultArr = []
+      this.goods.forEach(good => {
+        const { type, name, foods } = good
+        let count = 0
+
+        foods.forEach(food => {
+          count += food.count || 0
+        })
+
+        resultArr.push({
+          type,
+          name,
+          count
+        })
+      })
+
+      return resultArr
+    }
+  },
   methods: {
     async fetchData () {
       const data = await getGoodsData()
 
       this.goods = data
+    },
+    onAddFn (el) {
+      this.$refs.shopCart.dropBallFn(el)
     }
   }
 }
@@ -98,7 +177,7 @@ export default {
     width: 100%
     top: 0
     left: 0
-    bottom: 48px
+    bottom: 46px
 
   >>> .cube-scroll-nav-bar
     width: 80px
@@ -113,6 +192,17 @@ export default {
     line-height: 14px
     font-size: $fontsize-small
     background: $color-background-ssss
+
+    .menuText
+      position: relative
+
+      .leftIcon
+        vertical-align: -1px
+
+      .countBox
+        position: absolute
+        top: -10px
+        left: -10px
 
   >>> .cube-scroll-nav-bar-item_active
     background: $color-white
