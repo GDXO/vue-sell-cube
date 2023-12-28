@@ -1,5 +1,5 @@
 <template>
-  <div class="goodsContainer">
+  <div class="goodsContainer" ref="goodsContainer">
     <div class="scrollNavBox">
       <cube-scroll-nav
         :side="true"
@@ -80,6 +80,7 @@
       :deliveryPrice="seller.deliveryPrice"
       :minDeliveryPrice="seller.minPrice"
       :foodsList="selectedFoods"
+      @removeCompFn="onRemoveCompFn"
       ref="shopCart"
     />
   </div>
@@ -158,6 +159,9 @@ export default {
     },
     onAddFn (el) {
       this.$refs.shopCart.dropBallFn(el)
+    },
+    onRemoveCompFn (el) {
+      this.$refs.goodsContainer.appendChild(el)
     }
   }
 }

@@ -1,6 +1,10 @@
 <template>
-  <div class="shopCartWrapper">
-    <div class="shopCartBox" :style="{ width: getClientWidth }">
+  <div class="shopCartWrapper" ref="shopCartWrapper">
+    <div
+      class="shopCartBox"
+      :style="{ width: getClientWidth }"
+      @click.stop="toggleShopCartListFn"
+    >
       <div class="leftBox">
         <div class="logoContainer">
           <div class="logoBox" :class="{ haveFood: totalCount > 0 }">
@@ -17,7 +21,7 @@
         </div>
         <div class="priceDescBox">另需配送费￥{{ deliveryPrice }}元</div>
       </div>
-      <div class="rightBox" :class="rightStatusClass">
+      <div class="rightBox" :class="rightStatusClass" @click="payFn">
         {{ rightStatusHTML }}
       </div>
     </div>
@@ -76,12 +80,12 @@ export default {
   },
   created () {
     this.dropBalls = []
+    this.shopCartListFold = true
   },
   data () {
     return {
       balls: createBalls(),
-      dropBall: [],
-      shopCartListFold: true
+      dropBall: []
     }
   },
   computed: {
@@ -115,6 +119,11 @@ export default {
       else return 'finalRightBox'
     }
   },
+  watch: {
+    totalCount (newCount) {
+      if (!this.shopCartListFold && newCount === 0) this._hideShopCartList()
+    }
+  },
   methods: {
     dropBallFn (el) {
       this.balls.forEach(ball => {
@@ -132,9 +141,11 @@ export default {
       const y = -(window.innerHeight - rect.top - 22)
 
       el.style.display = 'inline-block'
-      el.style.transform = el.style.webkitTransform = `translate3d(0, ${y}px, 0)`
+      el.style.transform =
+        el.style.webkitTransform = `translate3d(0, ${y}px, 0)`
       const innerEl = el.getElementsByClassName('inner-hook')[0]
-      innerEl.style.transform = innerEl.style.webkitTransform = `translate3d(${x}px, 0, 0)`
+      innerEl.style.transform =
+        innerEl.style.webkitTransform = `translate3d(${x}px, 0, 0)`
     },
     dropping (el, done) {
       this._reflow = document.body.offsetHeight
@@ -142,7 +153,8 @@ export default {
       el.style.display = 'inline-block'
       el.style.transform = el.style.webkitTransform = 'translate3d(0, 0, 0)'
       const innerEl = el.getElementsByClassName('inner-hook')[0]
-      innerEl.style.transform = innerEl.style.webkitTransform = 'translate3d(0, 0, 0)'
+      innerEl.style.transform = innerEl.style.webkitTransform =
+        'translate3d(0, 0, 0)'
 
       el.addEventListener('transitionend', done)
     },
@@ -153,6 +165,57 @@ export default {
         ball.show = false
         el.style.display = 'none'
       }
+    },
+    toggleShopCartListFn () {
+      if (this.shopCartListFold) {
+        if (!this.totalCount) return false
+
+        this.shopCartListFold = false
+        this._showShopCartList()
+      } else {
+        this.shopCartListFold = true
+        this._hideShopCartList()
+      }
+    },
+    _showShopCartList () {
+      this.shopCartListComp =
+        this.shopCartListComp ||
+        this.$createShopCartList({
+          $props: {
+            foodsList: 'foodsList'
+          },
+          $events: {
+            hideShopCartListFn: () => {
+              this.shopCartListFold = true
+            },
+            addCountFn: el => {
+              this.dropBallFn(el)
+            }
+          }
+        })
+
+      // 移动组件到 body 下
+      document.body.appendChild(this.$refs.shopCartWrapper)
+
+      this.shopCartListComp.show()
+    },
+    _hideShopCartList () {
+      this.shopCartListComp.hide()
+
+      setTimeout(() => {
+        this.$emit('removeCompFn', this.$refs.shopCartWrapper)
+      }, 400)
+    },
+    payFn (evt) {
+      if (this.totalPrice < this.minDeliveryPrice) return false
+
+      this.dialogComp = this.$createDialog({
+        title: '支付',
+        content: `您需要支付 ￥${this.totalPrice + this.deliveryPrice}元`
+      })
+      this.dialogComp.show()
+
+      evt.stopPropagation()
     }
   }
 }
