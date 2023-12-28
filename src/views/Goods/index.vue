@@ -153,9 +153,12 @@ export default {
   },
   methods: {
     async fetchData () {
-      const data = await getGoodsData()
+      if (!this.fetched) {
+        const data = await getGoodsData()
 
-      this.goods = data
+        this.goods = data
+        this.fetched = true
+      }
     },
     onAddFn (el) {
       this.$refs.shopCart.dropBallFn(el)

@@ -1,7 +1,7 @@
 <template>
   <transition name="fade-popup">
     <cube-popup
-      v-show="shopCartListShow"
+      v-show="visible"
       :mask-closable="true"
       :z-index="40"
       position="bottom"
@@ -9,7 +9,7 @@
       @mask-click="maskClickFn"
     >
       <transition name="fold-shop-cart">
-        <div class="shopCartGoodsListBox" v-show="shopCartListShow">
+        <div class="shopCartGoodsListBox" v-show="visible">
           <div class="shopCartTitleBox border-bottom-1px">
             <h1 class="titleText">购物车</h1>
             <span class="clearShopCartBtn" @click="clearShopCartFn">清空</span>
@@ -42,10 +42,12 @@
 </template>
 
 <script>
+import popupMixin from '@/assets/js/mixins/popup'
 import CartControl from '@/components/CartControl/'
 
 export default {
   name: 'ShopCartList',
+  mixins: [popupMixin],
   components: {
     CartControl
   },
@@ -55,24 +57,14 @@ export default {
       default: () => []
     }
   },
-  data () {
-    return {
-      shopCartListShow: false
-    }
-  },
-  methods: {
-    show () {
-      this.shopCartListShow = true
-
+  created () {
+    this.$on('show', () => {
       this.$nextTick(() => {
         this.$refs.foodsListContent.refresh()
       })
-    },
-    hide () {
-      this.shopCartListShow = false
-
-      this.$emit('hideShopCartListFn')
-    },
+    })
+  },
+  methods: {
     maskClickFn () {
       this.hide()
     },

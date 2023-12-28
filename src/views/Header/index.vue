@@ -76,7 +76,7 @@ export default {
           }
         })
 
-      this.headerDetailComp.showDetailFn()
+      this.headerDetailComp.show()
     }
   }
 }

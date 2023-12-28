@@ -185,7 +185,7 @@ export default {
             foodsList: 'foodsList'
           },
           $events: {
-            hideShopCartListFn: () => {
+            hide: () => {
               this.shopCartListFold = true
             },
             addCountFn: el => {
@@ -209,11 +209,10 @@ export default {
     payFn (evt) {
       if (this.totalPrice < this.minDeliveryPrice) return false
 
-      this.dialogComp = this.$createDialog({
+      this.$createDialog({
         title: '支付',
         content: `您需要支付 ￥${this.totalPrice + this.deliveryPrice}元`
-      })
-      this.dialogComp.show()
+      }).show()
 
       evt.stopPropagation()
     }

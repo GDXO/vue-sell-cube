@@ -1,6 +1,6 @@
 <template>
   <transition name="fade">
-    <div v-show="detailShow" class="detailBox">
+    <div v-show="visible" class="detailBox">
       <div class="detailContentBox cleanBoth">
         <div class="detailMainBox">
           <h1 class="detailName">{{ seller.name }}</h1>
@@ -36,7 +36,7 @@
         </div>
       </div>
       <div class="detailCloseBox">
-        <svg class="icon" aria-hidden="true" @click="hideDetailFn">
+        <svg class="icon" aria-hidden="true" @click="hide">
           <use xlink:href="#take-close"></use>
         </svg>
       </div>
@@ -45,11 +45,13 @@
 </template>
 
 <script>
+import popupMixin from '@/assets/js/mixins/popup'
 import SupportIco from '@/components/SupportIco/'
 import Star from '@/components/Star/'
 
 export default {
   name: 'HeaderDetail',
+  mixins: [popupMixin],
   components: {
     SupportIco,
     Star
@@ -59,19 +61,6 @@ export default {
       type: Object,
       required: true,
       default: () => ({})
-    }
-  },
-  data () {
-    return {
-      detailShow: false
-    }
-  },
-  methods: {
-    showDetailFn () {
-      this.detailShow = true
-    },
-    hideDetailFn () {
-      this.detailShow = false
     }
   }
 }

@@ -20,11 +20,13 @@
         @scroll="onScrollFn"
       >
         <cube-slide-item v-for="(tab, tabIndex) of tabs" :key="tabIndex">
-          <component
-            :is="tab.component"
-            :data="tab.data"
-            ref="slideComponent"
-          ></component>
+          <keep-alive>
+            <component
+              :is="tab.component"
+              :data="tab.data"
+              ref="slideComponent"
+            ></component>
+          </keep-alive>
         </cube-slide-item>
       </cube-slide>
     </div>
