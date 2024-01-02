@@ -11,6 +11,7 @@
     "axios": "^1.6.2",
     "core-js": "^3.8.3",
     "cube-ui": "~1.12.15",
+    "moment": "^2.30.1",
     "vue": "^2.6.14"
   },
   "devDependencies": {

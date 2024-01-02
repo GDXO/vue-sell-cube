@@ -187,6 +187,10 @@ export default {
           $events: {
             hide: () => {
               this.shopCartListFold = true
+
+              setTimeout(() => {
+                this.$emit('removeCompFn', this.$refs.shopCartWrapper)
+              }, 400)
             },
             addCountFn: el => {
               this.dropBallFn(el)
@@ -194,17 +198,16 @@ export default {
           }
         })
 
-      // 移动组件到 body 下
-      document.body.appendChild(this.$refs.shopCartWrapper)
+      this.bodyAppendShopCartFn()
 
       this.shopCartListComp.show()
     },
+    bodyAppendShopCartFn () {
+      // 移动组件到 body 下
+      document.body.appendChild(this.$refs.shopCartWrapper)
+    },
     _hideShopCartList () {
       this.shopCartListComp.hide()
-
-      setTimeout(() => {
-        this.$emit('removeCompFn', this.$refs.shopCartWrapper)
-      }, 400)
     },
     payFn (evt) {
       if (this.totalPrice < this.minDeliveryPrice) return false
@@ -232,7 +235,7 @@ export default {
   left: 0
   z-index: 50
   width: 100%
-  height: 46px
+  height: 47px
 
   .leftBox
     flex: 1

@@ -43,6 +43,7 @@
               class="foodItemBox border-bottom-1px"
               v-for="foodItem in goodsItem.foods"
               :key="foodItem.name"
+              @click="_showFoodDetailFn(foodItem)"
             >
               <div class="foodImgBox">
                 <img
@@ -113,7 +114,9 @@ export default {
       scrollOptions: {
         click: false,
         directionLockThreshold: 0
-      }
+      },
+      selectedFood: {},
+      removeShopCartSwitch: true
     }
   },
   computed: {
@@ -164,7 +167,41 @@ export default {
       this.$refs.shopCart.dropBallFn(el)
     },
     onRemoveCompFn (el) {
-      this.$refs.goodsContainer.appendChild(el)
+      if (this.removeShopCartSwitch) {
+        if (el) {
+          this.$refs.goodsContainer.appendChild(el)
+        } else {
+          this.$refs.goodsContainer.appendChild(this.$refs.shopCart.$el)
+        }
+      }
+    },
+    _showFoodDetailFn (selectedFood) {
+      // 赋值选择的 food
+      this.selectedFood = selectedFood
+
+      this.foodDetailComp =
+        this.foodDetailComp ||
+        this.$createFoodDetail({
+          $props: {
+            selectedFood: 'selectedFood'
+          },
+          $events: {
+            hide: this._removeFoodDetailCompFn,
+            addCount: this.onAddFn
+          }
+        })
+
+      // this.$refs.shopCart.bodyAppendShopCartFn()
+      document.body.appendChild(this.$refs.shopCart.$el)
+
+      this.removeShopCartSwitch = false
+
+      this.foodDetailComp.show()
+    },
+    _removeFoodDetailCompFn () {
+      this.removeShopCartSwitch = true
+
+      this.onRemoveCompFn()
     }
   }
 }
