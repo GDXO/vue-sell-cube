@@ -1,4 +1,5 @@
 const { defineConfig } = require('@vue/cli-service')
+const webpack = require('webpack')
 
 // mock 数据
 const appData = require('./data.json')
@@ -21,6 +22,8 @@ module.exports = defineConfig({
       args[0].title = 'Vue 商城'
       return args
     })
+
+    config.plugin('context').use(webpack.ContextReplacementPlugin, [/moment[/\\]locale$/, /zh-cn/])
   },
   css: {
     loaderOptions: {
