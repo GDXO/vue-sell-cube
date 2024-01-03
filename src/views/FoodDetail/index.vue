@@ -1,7 +1,7 @@
 <template>
   <transition name="detail-show">
     <div v-show="visible" class="foodDetailBox">
-      <cube-scroll class="pageContentBox" ref="pageContentBox">
+      <cube-scroll class="pageContentBox" :data="filterRatings" ref="pageContentBox">
         <div class="headerBox">
           <img :src="selectedFood.image" alt="商品详情图片" />
           <svg
@@ -57,12 +57,11 @@
             @toggleShowContent="toggleShowContentFn"
           />
           <div class="ratingMainBox">
-            <ul v-if="ratings && ratings.length">
+            <ul v-if="filterRatings && filterRatings.length">
               <li
                 class="ratingItemBox"
-                v-for="(rating, ratingIndex) of ratings"
+                v-for="(rating, ratingIndex) of filterRatings"
                 :key="ratingIndex"
-                v-show="ratingShow(rating.rateType, rating.text)"
               >
                 <p class="ratingItemHeader cleanBoth">
                   <span class="ratingTime">{{
@@ -102,19 +101,15 @@
 </template>
 
 <script>
-import moment from 'moment'
 import popupMixin from '@/assets/js/mixins/popup'
+import ratingMixin from '@/assets/js/mixins/rating'
 import CartControl from '@/components/CartControl/'
 import IntervalBox from '@/components/Interval/'
 import RatingFilter from '@/components/RatingFilter/'
 
-const RATING_ALL = 2
-const RATING_POSITIVE = 1
-const RATING_NEGATIVE = 0
-
 export default {
   name: 'FoodDetail',
-  mixins: [popupMixin],
+  mixins: [popupMixin, ratingMixin],
   components: {
     CartControl,
     IntervalBox,
@@ -137,8 +132,6 @@ export default {
   data () {
     return {
       visible: false,
-      selectedType: RATING_ALL,
-      showContent: false,
       desc: {
         all: '全部',
         positive: '推荐',
@@ -148,29 +141,10 @@ export default {
   },
   computed: {
     ratings () {
-      console.log(this.selectedFood.ratings)
-
       return this.selectedFood.ratings
     }
   },
-  filters: {
-    formateDate (time) {
-      return moment(time).format('YYYY-MM-DD hh:mm')
-    }
-  },
   methods: {
-    pageShowFn () {
-      this.visible = true
-
-      // 初始化评论的数据状态
-      this.selectedType = RATING_ALL
-      this.showContent = false
-      this.desc = {
-        all: '全部',
-        positive: '推荐',
-        negative: '吐槽'
-      }
-    },
     addFirstFoodFn (evt) {
       if (!evt._constructed) return false
 
@@ -180,27 +154,6 @@ export default {
     },
     emitParentAddCountFn (target) {
       this.$emit('addCount', target)
-    },
-    changeSelectedTypeFn (btnType) {
-      this.selectedType = btnType
-      this.$nextTick(() => {
-        this.$refs.pageContentBox.refresh()
-      })
-    },
-    toggleShowContentFn (contentType) {
-      this.showContent = contentType
-      this.$nextTick(() => {
-        this.$refs.pageContentBox.refresh()
-      })
-    },
-    ratingShow (type, text) {
-      if (this.showContent && !text) return false
-      if (this.selectedType === RATING_ALL) return true
-      else if (type * 1 + 1 === RATING_POSITIVE) {
-        return this.selectedType === RATING_POSITIVE
-      } else if (type * 1 - 1 === RATING_NEGATIVE) {
-        return this.selectedType === RATING_NEGATIVE
-      }
     }
   }
 }

@@ -6,8 +6,8 @@
 </template>
 
 <script>
+import qs from 'query-string'
 import { getSellerData } from '@/api/'
-import { getUrlParams } from '@/assets/js/utils'
 import Header from '@/views/Header/'
 import Tabs from '@/components/Tabs/'
 import Goods from '@/views/Goods/'
@@ -23,10 +23,7 @@ export default {
   data () {
     return {
       seller: {
-        id: (() => {
-          const params = getUrlParams()
-          return params.id
-        })()
+        id: qs.parse(window.location.search).id
       }
     }
   },
@@ -62,7 +59,9 @@ export default {
   },
   methods: {
     async _getSellers () {
-      const data = await getSellerData()
+      const data = await getSellerData({
+        id: this.seller.id
+      })
 
       this.seller = Object.assign({}, this.seller, data)
     }

@@ -10,16 +10,16 @@
       </span>
       <span
         class="positiveBtn"
-        :class="{ active: selectedType === 1 }"
-        @click="selectedTypeFn(1, $event)"
+        :class="{ active: selectedType === 0 }"
+        @click="selectedTypeFn(0, $event)"
       >
         {{ desc.positive
         }}<span class="ratingCount">{{ positiveCountNum }}</span>
       </span>
       <span
         class="negativeBtn"
-        :class="{ active: selectedType === 0 }"
-        @click="selectedTypeFn(0, $event)"
+        :class="{ active: selectedType === 1 }"
+        @click="selectedTypeFn(1, $event)"
       >
         {{ desc.negative
         }}<span class="ratingCount">{{ negativeCountNum }}</span>
@@ -30,7 +30,7 @@
         class="icon switchIcon"
         aria-hidden="true"
         :class="{ active: showContent }"
-        @click="toggleShowContentFn"
+        @click.stop="toggleShowContentFn"
       >
         <use xlink:href="#take-check_circle"></use>
       </svg>
@@ -41,8 +41,8 @@
 
 <script>
 const RATING_ALL = 2
-const RATING_POSITIVE = 1
-const RATING_NEGATIVE = 0
+const RATING_POSITIVE = 0
+const RATING_NEGATIVE = 1
 
 export default {
   name: 'RatingFilter',
@@ -75,18 +75,19 @@ export default {
   computed: {
     positiveCountNum () {
       return this.ratingsData.filter(
-        rating => rating.rateType * 1 + 1 === RATING_POSITIVE
+        rating => rating.rateType === RATING_POSITIVE
       ).length
     },
     negativeCountNum () {
       return this.ratingsData.filter(
-        rating => rating.rateType * 1 - 1 === RATING_NEGATIVE
+        rating => rating.rateType === RATING_NEGATIVE
       ).length
     }
   },
   methods: {
     selectedTypeFn (emitType, evt) {
       if (!evt._constructed) return false
+
       this.$emit('changeSelectedType', emitType)
     },
     toggleShowContentFn (evt) {
